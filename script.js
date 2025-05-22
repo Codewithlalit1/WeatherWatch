@@ -19,4 +19,37 @@ async function getWeather(){
     let futureWeather = await fetch(futureURL);
     let futureFormat = await futureWeather.json();
     console.log(futureFormat);
+
+
+    // code to show 5 days date on div with id="day-1 to 5"
+    const list = futureFormat.list;
+    const groupedByDate = {};
+    list.forEach(item=>{
+        const date = item.dt_txt.split(' ')[0];
+        if(!groupedByDate[date]) groupedByDate[date] = [];
+        groupedByDate[date].push(item);
+    });
+    const dates = Object.keys(groupedByDate).slice(0, 5);
+    dates.forEach((date, index) => {
+        const container = document.getElementById(`day-${index + 1}`);
+        if (!container) return;
+    
+        // Add a date heading
+        const heading = document.createElement('h3');
+        const formattedDate = new Date(date).toDateString(); // e.g., Mon May 20 2025
+        heading.textContent = formattedDate;
+        heading.style.textAlign = 'center';
+        heading.style.marginBottom = '10px';
+        container.appendChild(heading);
+    
+        groupedByDate[date].forEach(entry => {
+            const time = entry.dt_txt.split(' ')[1].slice(0, 5);
+            const temp = (entry.main.temp - 273.15).toFixed(1);
+            const weather = entry.weather[0].description;
+    
+            const itemDiv = document.createElement('div');
+            itemDiv.innerHTML = `<strong>${time}</strong> - ${temp}°C - ${weather}`;
+            container.appendChild(itemDiv);
+        });
+    });
 }
